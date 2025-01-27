@@ -2,12 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+const constants = require("constants.ts");
+
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/chat-room-101', {
+mongoose.connect(constants.aws_doc_db_con_str, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
