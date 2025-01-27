@@ -1,0 +1,10 @@
+{
+  "description": "data used for the Chat Room application",
+  "numVisitors": null,
+  "data": [
+    {
+      "name": "Anonymous Wasp",
+      "message": "Hello"
+    }
+  ]
+}
