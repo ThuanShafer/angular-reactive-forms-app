@@ -1,0 +1,36 @@
+<div id="header">
+  <h1>Cloud Computing 101 Chat Room</h1>
+</div>
+
+<div id="chatArea">
+  <div *ngFor="let chat of chatData">
+    <p class="chatArea__text">
+      <strong>{{ chat.name }}:</strong> &nbsp; <i>{{ chat.message }}</i>
+    </p>
+  </div>
+</div>
+
+<div id="inputArea">
+  <textarea
+    id="inputArea__name"
+    [(ngModel)]="name"
+    maxlength="40"
+    spellcheck="false"
+    disabled
+  ></textarea>
+  <textarea
+    id="inputArea__message"
+    [(ngModel)]="message"
+    maxlength="400"
+    spellcheck="false"
+    (keydown)="onMessageKeyDown($event)"
+    (input)="onMessageInput()"
+  ></textarea>
+  <button
+    id="inputArea__sendButton"
+    [disabled]="isSendDisabled"
+    (click)="sendMessage()"
+  >
+    Send
+  </button>
+</div>
