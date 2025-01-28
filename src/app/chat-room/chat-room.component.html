@@ -1,11 +1,16 @@
 <div id="header">
-  <h1>Cloud Computing 101 Chat Room</h1>
+  <h1>Cloud Computing Public Chat Room</h1>
+    <i class="user-count"><strong>Active Users: {{userCount}}</strong></i>
 </div>
 
-<div id="chatArea">
-  <div *ngFor="let chat of chatData">
+<div id="chatArea" #chatContainer>
+  <div class="chat-container" *ngFor="let chat of chatData">
     <p class="chatArea__text">
-      <strong>{{ chat.name }}:</strong> &nbsp; <i>{{ chat.message }}</i>
+      <span class="name">{{ chat.name }}:</span>
+      <span class="timestamp">{{ formatTimestamp(chat.timestamp) }}</span>
+    </p>
+    <p class="chatArea__text">
+      <span class="message">{{ chat.message }}</span>
     </p>
   </div>
 </div>

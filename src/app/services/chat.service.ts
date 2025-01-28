@@ -1,22 +1,35 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:3000/api/chat';
+  private socket: WebSocket | null = null;
+  private chatMessagesSubject = new Subject<any[]>();
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
-  // Fetch all chat messages
-  getChatData(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  connectWebSocket(): void {
+    this.socket = new WebSocket('ws://localhost:3000');
+
+    this.socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      this.chatMessagesSubject.next(data);
+    };
   }
 
-  // Add a new chat message
-  addChatMessage(name: string, message: string): Observable<any[]> {
-    return this.http.post<any[]>(this.apiUrl, { name, message });
+  disconnectWebSocket(): void {
+    this.socket?.close();
+    this.socket = null;
+  }
+
+  sendMessage(name: string, message: string): void {
+    const payload = { name, message, message_sent_timestamp: new Date().toISOString() };
+    this.socket?.send(JSON.stringify(payload));
+  }
+
+  getChatMessages(): Observable<any[]> {
+    return this.chatMessagesSubject.asObservable();
   }
 }

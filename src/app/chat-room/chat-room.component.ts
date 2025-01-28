@@ -1,28 +1,43 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ChatService } from '../services/chat.service';
-import {assignRandomAdjective, assignRandomName} from "../helper-utils/helper";
+import { assignRandomAdjective, assignRandomName, formatTimestamp } from "../helper-utils/helper";
 
 @Component({
   selector: 'app-chat-room',
   templateUrl: './chat-room.component.html',
   styleUrls: ['./chat-room.component.css'],
 })
-export class ChatRoomComponent implements OnInit {
+export class ChatRoomComponent implements OnInit, OnDestroy {
+  @ViewChild('chatContainer') private chatContainer!: ElementRef;
   name: string = '';
   message: string = '';
-  chatData: { name: string; message: string }[] = [];
+  chatData: { name: string; message: string; timestamp: string }[] = [];
+  userCount: number = 0;
   isSendDisabled: boolean = true;
 
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
     this.name = this.getOrCreateName();
-    this.loadChatData();
+    this.chatService.connectWebSocket();
+
+    this.chatService.getChatMessages().subscribe((data: any) => {
+      if (data.chats) {
+        this.chatData = data.chats;
+      }
+      if (data.userCount !== undefined) {
+        this.userCount = data.userCount;
+      }
+      this.scrollToBottom();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.chatService.disconnectWebSocket();
   }
 
   getOrCreateName(): string {
     const storedName = sessionStorage.getItem('chatName');
-
     if (storedName) {
       return storedName;
     } else {
@@ -32,30 +47,33 @@ export class ChatRoomComponent implements OnInit {
     }
   }
 
-  loadChatData(): void {
-    this.chatService.getChatData().subscribe((data) => {
-      this.chatData = data;
-    });
-  }
-
   sendMessage(): void {
     if (this.message.trim()) {
-      this.chatService.addChatMessage(this.name, this.message).subscribe((updatedData) => {
-        this.chatData = updatedData;
-        this.message = '';
-      });
+      this.chatService.sendMessage(this.name, this.message);
+      this.message = '';
+      this.isSendDisabled = true;
     }
   }
 
-  onMessageInput() {
+  onMessageInput(): void {
     this.isSendDisabled = this.message.trim().length === 0;
   }
 
   onMessageKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' && this.message.trim()) {
-      event.preventDefault();
+    if (event.key === 'Enter' && !event.shiftKey && this.message.trim()) {
       this.sendMessage();
+      event.preventDefault();
     }
-    this.isSendDisabled = this.message.trim().length === 0;
   }
+
+  private scrollToBottom(): void {
+    if (this.chatContainer) {
+      setTimeout(() => {
+        this.chatContainer.nativeElement.scrollTop =
+          this.chatContainer.nativeElement.scrollHeight;
+      }, 0);
+    }
+  }
+
+  protected readonly formatTimestamp = formatTimestamp;
 }

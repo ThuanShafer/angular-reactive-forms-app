@@ -6,6 +6,7 @@
 /node_modules_backupnpm-debug.log
 yarn-debug.log
 yarn-error.log
+server/node_modules
 
 # Angular Build Output
 /dist/
@@ -36,8 +37,20 @@ db/
 .idea/
 .vscode/
 
+# misc
+/.angular/cache
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
 # Dependencies
 package-lock.json
+server/package-lock.json
 yarn.lock
 
 # Environment files
