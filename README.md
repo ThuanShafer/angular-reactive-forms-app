@@ -1,4 +1,4 @@
-# Cloud Computing 101 Chat Room
+# Cloud Computing Chat Room
 
 A simple chat room application built with Angular and Node.js. This app allows users to send and receive chat messages, with a randomly assigned username that persists throughout the session using `sessionStorage`.
 
