@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const mongoUri = 'mongodb://localhost:27017/chats';
+const mongoUri = 'mongodb://mongodb://chatadmin:1qaz2wsx@chat-room-101.cluster-cbku282k01wo.ap-southeast-1.docdb.amazonaws.com:27017/?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false';
 const dbName = 'chats';
 const collectionName = 'messages';
 
