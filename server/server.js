@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const mongoUri = 'mongodb://mongodb://chatadmin:1qaz2wsx@chat-room-101.cluster-cbku282k01wo.ap-southeast-1.docdb.amazonaws.com:27017/?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false';
+const mongoUri = 'mongodb://chatadmin:1qaz2wsx@chat-room-101.cluster-cbku282k01wo.ap-southeast-1.docdb.amazonaws.com:27017/?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false';
 const dbName = 'chats';
 const collectionName = 'messages';
 
@@ -23,7 +23,7 @@ MongoClient.connect(mongoUri)
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
-  });
+});
 
 app.get('/api/chat', async (req, res) => {
   try {
@@ -90,13 +90,13 @@ wss.on('connection', async (ws) => {
 
 function broadcastMessage(data) {
   wss.clients.forEach((client) => {
-    if (client.readyState === 1) { // WebSocket.OPEN
+    if (client.readyState === 1) {
       client.send(JSON.stringify(data));
     }
   });
 }
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
