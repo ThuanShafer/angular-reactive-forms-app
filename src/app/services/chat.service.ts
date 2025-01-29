@@ -11,7 +11,10 @@ export class ChatService {
   constructor() {}
 
   connectWebSocket(): void {
-    this.socket = new WebSocket('ws://0.0.0.0:3000');
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const serverUrl = `${protocol}://ec2-13-250-46-200.ap-southeast-1.compute.amazonaws.com:3000`;
+
+    this.socket = new WebSocket(serverUrl);
 
     this.socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
