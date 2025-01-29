@@ -12,9 +12,9 @@ server/node_modules
 /dist/
 /out-tsc/
 
-# Angular Environment Files
-/src/environments/environment.prod.ts
-/src/environments/environment.ts
+## Angular Environment Files
+#/src/environments/environment.prod.ts
+#/src/environments/environment.ts
 
 # VS Code directory
 .vscode/
