@@ -1,27 +1,33 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('ws');
+const { MongoClient } = require('mongodb');
 
+// App setup
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect('mongodb://localhost:27017/chats', {}).then(() => console.log('Connected to MongoDB'))
-  .catch((e) => console.log('MongoDB connection error:', e));
+const mongoUri = 'mongodb://chatadmin:1qaz2wsx@chat-room-101.cluster-cbku282k01wo.ap-southeast-1.docdb.amazonaws.com:27017/?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false';
+const dbName = 'chats';
+const collectionName = 'messages';
 
-const chatSchema = new mongoose.Schema({
-  name: String,
-  message: String,
-  timestamp: { type: Date, default: Date.now },
-});
+let db, chatCollection;
 
-const Chat = mongoose.model('Chat', chatSchema);
+MongoClient.connect(mongoUri)
+  .then((client) => {
+    db = client.db(dbName);
+    chatCollection = db.collection(collectionName);
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+  });
 
 app.get('/api/chat', async (req, res) => {
   try {
-    const chats = await Chat.find().sort({ timestamp: 1 });
+    const chats = await chatCollection.find().sort({ timestamp: 1 }).toArray();
     res.json(chats);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching chat data' });
@@ -30,17 +36,13 @@ app.get('/api/chat', async (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   const { name, message } = req.body;
+  const timestamp = new Date();
   
   try {
-    const newChat = new Chat({ name, message });
-    await newChat.save();
+    await chatCollection.insertOne({ name, message, timestamp });
     
-    const updatedChats = await Chat.find().sort({ timestamp: 1 });
-    wss.clients.forEach((client) => {
-      if (client.readyState === 1) { // WebSocket.OPEN
-        client.send(JSON.stringify({ chats: updatedChats, userCount }));
-      }
-    });
+    const updatedChats = await chatCollection.find().sort({ timestamp: 1 }).toArray();
+    broadcastMessage({ chats: updatedChats, userCount });
     
     res.json(updatedChats);
   } catch (err) {
@@ -58,30 +60,22 @@ wss.on('connection', async (ws) => {
   userCount++;
   
   try {
-    const chats = await Chat.find().sort({ timestamp: 1 });
+    const chats = await chatCollection.find().sort({ timestamp: 1 }).toArray();
     ws.send(JSON.stringify({ chats, userCount }));
   } catch (err) {
     console.error('Error fetching chats for WebSocket client:', err);
   }
   
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) {
-      client.send(JSON.stringify({ userCount }));
-    }
-  });
+  broadcastMessage({ userCount });
   
   ws.on('message', async (message) => {
     try {
       const { name, message: text } = JSON.parse(message);
-      const newChat = new Chat({ name, message: text });
-      await newChat.save();
+      const timestamp = new Date();
+      await chatCollection.insertOne({ name, message: text, timestamp });
       
-      const updatedChats = await Chat.find().sort({ timestamp: 1 });
-      wss.clients.forEach((client) => {
-        if (client.readyState === 1) {
-          client.send(JSON.stringify({ chats: updatedChats, userCount }));
-        }
-      });
+      const updatedChats = await chatCollection.find().sort({ timestamp: 1 }).toArray();
+      broadcastMessage({ chats: updatedChats, userCount });
     } catch (err) {
       console.error('Error processing message:', err);
     }
@@ -90,14 +84,17 @@ wss.on('connection', async (ws) => {
   ws.on('close', () => {
     console.log('WebSocket connection closed');
     userCount--;
-    
-    wss.clients.forEach((client) => {
-      if (client.readyState === 1) {
-        client.send(JSON.stringify({ userCount }));
-      }
-    });
+    broadcastMessage({ userCount });
   });
 });
+
+function broadcastMessage(data) {
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) { // WebSocket.OPEN
+      client.send(JSON.stringify(data));
+    }
+  });
+}
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
