@@ -11,7 +11,7 @@ export class ChatService {
   constructor() {}
 
   connectWebSocket(): void {
-    this.socket = new WebSocket('ws://0.0.0.0:3000');
+    this.socket = new WebSocket('ws://13.250.46.200:3000');
 
     this.socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
