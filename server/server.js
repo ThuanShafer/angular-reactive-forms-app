@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const mongoUri = 'mongodb://chatadmin:1qaz2wsx@chat-room-101.cluster-cbku282k01wo.ap-southeast-1.docdb.amazonaws.com:27017/?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false';
+const mongoUri = 'mongodb://localhost:27017/chats';
 const dbName = 'chats';
 const collectionName = 'messages';
 
@@ -97,6 +97,6 @@ function broadcastMessage(data) {
 }
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });

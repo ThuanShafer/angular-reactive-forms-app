@@ -1,9 +1,11 @@
 {
-  "name": "chat-room-101",
-  "version": "0.0.0",
+  "name": "chat-room-server",
+  "version": "1.0.0",
+  "description": "Real-time chat application with Angular frontend and WebSocket backend",
+  "main": "server.js",
   "scripts": {
     "ng": "ng",
-    "start": "concurrently \"ng serve\" \"node server/server.js\"",
+    "start": "concurrently \"node server/server.js\" \"ng serve\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -18,8 +20,12 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongodb": "^6.12.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
+    "ws": "^8.8.1",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -35,5 +41,10 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
     "typescript": "~4.7.2"
-  }
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "",
+  "license": "ISC"
 }
