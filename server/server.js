@@ -97,6 +97,6 @@ function broadcastMessage(data) {
 }
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, 'ec2-13-250-46-200.ap-southeast-1.compute.amazonaws.com', () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
