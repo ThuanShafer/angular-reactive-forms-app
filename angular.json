@@ -72,7 +72,9 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "port": 4242
+            "host": "0.0.0.0",
+            "port": 4242,
+            "disableHostCheck": true
           }
         },
         "extract-i18n": {
