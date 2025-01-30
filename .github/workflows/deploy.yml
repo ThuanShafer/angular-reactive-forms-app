@@ -21,50 +21,32 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-      # Navigate to your project directory
-      - name: Navigate to project directory
-        run: |
-          cd basic-chat-room-101
+            # Navigate to your project directory
+            cd basic-chat-room-101
 
-      # Pull the latest code from GitHub
-      - name: Pull latest code
-        run: |
-          git pull origin main
+            # Pull the latest code from GitHub
+            git pull origin main
 
-      # Install dependencies
-      - name: Install dependencies
-        run: |
-          npm install
+            # Install dependencies
+            npm install
 
-      # Stop current PM2 processes (if any are running)
-      - name: Stop existing processes
-        run: |
-          pm2 stop angular-app || true
-          pm2 stop node-server || true
+            # Stop current PM2 processes (if any are running)
+            pm2 stop angular-app || true
+            pm2 stop node-server || true
 
-      # Build the Angular app (production build)
-      - name: Build Angular app
-        run: |
-          npm run build --prod
+            # Build the Angular app (production build)
+            npm run build --prod
 
-      # Start the Node.js server with PM2
-      - name: Start Node.js server with PM2
-        run: |
-          pm2 start server/server.js --name "node-server"
+            # Start the Node.js server with PM2
+            pm2 start server/server.js --name "node-server"
 
-      # Start Angular app with PM2
-      - name: Start Angular app with PM2
-        run: |
-          pm2 start "ng serve --host 0.0.0.0 --port 4242 --disable-host-check" --name "angular-app"
+            # Start Angular app with PM2
+            pm2 start "ng serve --host 0.0.0.0 --port 4242 --disable-host-check" --name "angular-app"
 
-      # Optionally save the PM2 process list (for automatic restarts on reboot)
-      - name: Save PM2 process list
-        run: |
-          pm2 save
+            # Optionally save the PM2 process list (for automatic restarts on reboot)
+            pm2 save
 
-      # Optionally: Set up PM2 to restart on server reboot
-      - name: Setup PM2 restart on reboot
-        run: |
-          pm2 startup systemd
-          sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u $USER --hp /home/$USER
-          EOF
+            # Optionally: Set up PM2 to restart on server reboot
+            pm2 startup systemd
+            sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u $USER --hp /home/$USER
+            EOF
