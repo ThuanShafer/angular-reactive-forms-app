@@ -37,11 +37,8 @@ jobs:
             # Build the Angular app (production build)
             npm run build --prod
 
-            # Start the Node.js server with PM2
-            pm2 start server/server.js --name "node-server"
-
             # Start Angular app with PM2 (fixed quotes issue)
-            pm2 start npm --name "angular-app" --run start-dev
+            pm2 start npm --name "angular-app" --run start
 
             # Optionally save the PM2 process list (for automatic restarts on reboot)
             pm2 save
