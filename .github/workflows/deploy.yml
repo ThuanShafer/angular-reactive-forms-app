@@ -21,8 +21,26 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd basic-chat-room-101  # Change to your project directory
+            # Navigate to your project directory
+            cd basic-chat-room-101
+
+            # Pull the latest code from GitHub
             git pull origin main
-            npm install  # or pip install -r requirements.txt for Python
-            pm2 restart all  # If using PM2 for Node.js apps
+
+            # Install dependencies
+            npm install
+
+            # Stop the current processes (if they are running)
+            pm2 stop angular-app || true
+            pm2 stop node-server || true
+
+            # Build the Angular app (production build)
+            npm run build
+
+            # Start both Node.js server and Angular app using PM2 (concurrently)
+            pm2 start server/server.js --name "node-server"
+            pm2 start dist/basic-chat-room-101 --name "angular-app" --serve
+
+            # Optionally: Save the PM2 process list (for automatic restarts on server reboot)
+            pm2 save
           EOF
