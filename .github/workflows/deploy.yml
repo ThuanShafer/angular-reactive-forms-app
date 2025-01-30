@@ -22,10 +22,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
       # Navigate to your project directory
-            cd basic-chat-room-101
+      - name: Navigate to project directory
+        run: |
+          cd basic-chat-room-101
 
       # Pull the latest code from GitHub
-            git pull origin main
+      - name: Pull latest code
+        run: |
+          git pull origin main
 
       # Install dependencies
       - name: Install dependencies
