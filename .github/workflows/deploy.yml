@@ -38,7 +38,7 @@ jobs:
             npm run build --prod
 
             # Start Angular app with PM2 (fixed quotes issue)
-            pm2 start npm --name "angular-app" --run start
+            pm2 start npm --name "angular-app" -- start
 
             # Optionally save the PM2 process list (for automatic restarts on reboot)
             pm2 save
