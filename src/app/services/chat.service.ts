@@ -12,7 +12,8 @@ export class ChatService {
 
   connectWebSocket(): void {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const serverUrl = `${protocol}://ec2-13-250-46-200.ap-southeast-1.compute.amazonaws.com:3000`;
+    const serverUrl = `${protocol}://54.169.23.158:3000`;
+    // const serverUrl = `${protocol}://localhost:3000`;
 
     this.socket = new WebSocket(serverUrl);
 
