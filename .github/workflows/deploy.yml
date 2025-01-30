@@ -28,20 +28,39 @@ jobs:
             git pull origin main
 
             # Install dependencies
-            npm install
+      - name: Install dependencies
+        run: |
+          npm install
 
-            # Stop the current processes (if they are running)
-            pm2 stop angular-app || true
-            pm2 stop node-server || true
+      # Stop current PM2 processes (if any are running)
+      - name: Stop existing processes
+        run: |
+          pm2 stop angular-app || true
+          pm2 stop node-server || true
 
-            # Build the Angular app (production build)
-            npm run build
+      # Build the Angular app (production build)
+      - name: Build Angular app
+        run: |
+          npm run build --prod
 
-            # Start both Node.js server and Angular app using PM2 (concurrently)
-            pm2 start server/server.js --name "node-server"
-            # Start Angular with custom options using pm2 (as ng serve)
-            pm2 start "ng serve --host 0.0.0.0 --port 4242 --disable-host-check" --name "angular-app"
+      # Start the Node.js server with PM2
+      - name: Start Node.js server with PM2
+        run: |
+          pm2 start server/server.js --name "node-server"
 
-            # Optionally: Save the PM2 process list (for automatic restarts on server reboot)
-            pm2 save
+      # Start Angular app with PM2
+      - name: Start Angular app with PM2
+        run: |
+          pm2 start "ng serve --host 0.0.0.0 --port 4242 --disable-host-check" --name "angular-app"
+
+      # Optionally save the PM2 process list (for automatic restarts on reboot)
+      - name: Save PM2 process list
+        run: |
+          pm2 save
+
+      # Optionally: Set up PM2 to restart on server reboot
+      - name: Setup PM2 restart on reboot
+        run: |
+          pm2 startup systemd
+          sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u $USER --hp /home/$USER
           EOF
