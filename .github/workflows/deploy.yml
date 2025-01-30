@@ -39,7 +39,8 @@ jobs:
 
             # Start both Node.js server and Angular app using PM2 (concurrently)
             pm2 start server/server.js --name "node-server"
-            pm2 start dist/basic-chat-room-101 --name "angular-app" --serve
+            # Start Angular with custom options using pm2 (as ng serve)
+            pm2 start "ng serve --host 0.0.0.0 --port 4242 --disable-host-check" --name "angular-app"
 
             # Optionally: Save the PM2 process list (for automatic restarts on server reboot)
             pm2 save
