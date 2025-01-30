@@ -2,47 +2,27 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ main ]  # or your default branch
+    branches:
+      - main  # Change this to your main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Install SSH Key
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Setup SSH Key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
 
       - name: Deploy to EC2
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
         run: |
-          # Add host key
-          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-          
-          # Deploy
-          ssh $EC2_USERNAME@$EC2_HOST '
-            # Navigate to app directory
-            cd /var/www/app
-          
-            # Pull code
-            if [ -d ".git" ]; then
-              git pull origin main
-            else
-              git clone https://github.com/yourusername/your-repo.git .
-            fi
-          
-            # Reset permissions
-            sudo chown -R ec2-user:ec2-user ./*
-          
-            # Install dependencies (uncomment what you need)
-            # npm install
-            # pip install -r requirements.txt
-          
-            # Restart service
-            sudo systemctl restart your-service
-            '
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd /var/www/myapp  # Change to your project directory
+            git pull origin main
+            npm install  # or pip install -r requirements.txt for Python
+            pm2 restart all  # If using PM2 for Node.js apps
+          EOF
